@@ -27,7 +27,7 @@ Input
 ```
 
 ## Usage
-  First, you should make sure that your caffe is correctly installed. You can follow this blog's instructions if you use windows.(https://zhuanlan.zhihu.com/p/22129880)
+  First, you should make sure that your caffe is correctly installed. You can follow this blog's instructions if you use windows.
 
   for training
   ```
