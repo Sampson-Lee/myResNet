@@ -4,13 +4,17 @@ display: 100
 gamma: 0.1
 iter_size: 1
 lr_policy: "multistep"
-max_iter: 100000
+#stepsize:4000
+stepvalue:4000
+stepvalue:8000
+max_iter: 10000
 momentum: 0.9
-snapshot: 2500
-snapshot_prefix: "./res_net_model/snapshot"
+snapshot: 10000
+snapshot_prefix: "cifar10_res20"
 test_initialization: false
 test_interval: 500
 test_iter: 100
-test_net: "test.prototxt"
-train_net: "train.prototxt"
+test_net: "./test.prototxt"
+train_net: "./train.prototxt"
 weight_decay: 0.0001
+solver_mode: GPU

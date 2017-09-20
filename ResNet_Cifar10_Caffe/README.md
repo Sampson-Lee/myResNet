@@ -61,6 +61,8 @@ model|PlainNet|ResNet
 56 layers|85.26%|93.09%
 110 layers|X|93.27%
 
+**data augmentation is important!!!**
+
 ## Blog address
 resnet_paper:
 - [Deep Residual Networks学习（一）](https://zhuanlan.zhihu.com/p/22071346)

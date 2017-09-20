@@ -13,7 +13,7 @@ import tools
 def conv_BN_scale_relu(split, bottom, numout, kernelsize, stride, pad):
     conv = L.Convolution(bottom, kernel_size = kernelsize, stride = stride,
                          num_output=numout,pad=pad,bias_term=True,
-                         weight_filler=dict(type = 'xavier'),   #xavier即随上下文变化
+                         weight_filler=dict(type = 'gaussian'),   #xavier算法，保证方差一致,也可以使用gaussian
                          bias_filler = dict(type = 'constant'), 
                          param = [dict(lr_mult = 1, decay_mult = 1), 
                                   dict(lr_mult = 2, decay_mult = 0)])
@@ -32,7 +32,7 @@ def conv_BN_scale_relu(split, bottom, numout, kernelsize, stride, pad):
                                                    dict(lr_mult = 0, decay_mult = 0)])
     #caffe中 BN 层并不能学习到 α 和 β 参数，因此要加上 scale 层学习
     scale = L.Scale(BN, scale_param = dict(bias_term = True), in_place = True)  #in-place能节省内存
-    relu = L.ReLu(scale, in_place = True)
+    relu = L.ReLU(scale, in_place = True)
     return scale,relu      
 
 def ResNet_block(split, bottom, numout, kernelsize, stride, projection_stride, pad):
@@ -46,40 +46,57 @@ def ResNet_block(split, bottom, numout, kernelsize, stride, projection_stride, p
     scale1,relu1=conv_BN_scale_relu(split,bottom,numout,kernelsize,projection_stride,pad)
     scale2,relu2=conv_BN_scale_relu(split,relu1,numout,kernelsize,stride,pad)
     wise=L.Eltwise(scale2, scale0, operation = P.Eltwise.SUM)
-    wise_relu = L.ReLu(wise, in_place = True)
+    wise_relu = L.ReLU(wise, in_place = True)
     
     return wise_relu
     
 def ResNet(split):
     # 写入数据的路径
-    train_file = './script_data/cifar10_train_lmdb'
-    test_file = './script_data/cifar10_test_lmdb'
-    mean_file = './script_data/mean.binaryproto'
+    train_file = '../data/cifar10_train_lmdb'
+    test_file = '../data/cifar10_test_lmdb'
+    mean_file = '../data/mean.binaryproto'
 
     # source: 导入的训练数据路径; 
     # backend: 训练数据的格式; 
     # ntop: 有多少个输出,这里是 2 个,分别是 n.data 和 n.labels,即训练数据和标签数据,
     # 对于 caffe 来说 bottom 是输入,top 是输出
     # mirror: 定义是否水平翻转,这里选是
+    
+    #如果写的是 deploy.prototxt 文件，不用data层
+    if split == 'deploy':
+        #conv1     
+        conv = L.Convolution(bottom='data', kernel_size = 3, stride = 1,
+                            num_output=16, pad=1, bias_term=True,
+                            weight_filler=dict(type = 'gaussian'),   
+                            bias_filler = dict(type = 'constant'), 
+                            param = [dict(lr_mult = 1, decay_mult = 1), 
+                                    dict(lr_mult = 2, decay_mult = 0)])
+        BN = L.BatchNorm(conv,batch_norm_param=dict(use_global_stats = True), 
+                         in_place = True, param = [dict(lr_mult = 0, decay_mult = 0), 
+                                                   dict(lr_mult = 0, decay_mult = 0), 
+                                                   dict(lr_mult = 0, decay_mult = 0)])
+        scale = L.Scale(BN, scale_param = dict(bias_term = True), in_place = True)
+        result = L.ReLU(scale, in_place = True) 
+    # 如果写的是训练和测试网络的 prototext 文件
+    else:    
+        if split == 'train':
+            data, labels = L.Data(source=train_file,backend=P.Data.LMDB,
+                                batch_size=100, ntop=2,
+                                transform_param=dict(mean_file=mean_file,
+                                                    crop_size=28,
+                                                    mirror=True))     
+        elif split == 'test':
+            data, labels = L.Data(source = test_file, backend = P.Data.LMDB, 
+                                batch_size = 100, ntop = 2, 
+                                transform_param = dict(mean_file = mean_file, 
+                                                        crop_size =28))
+        #conv1      
+        scale, result = conv_BN_scale_relu(split, data, numout = 16, kernelsize = 3, 
+                                            stride = 1, pad = 1)
 
-    # 如果写是训练网络的 prototext 文件    
-    if split == 'train':
-        data, labels = L.Data(source=train_file,backend=P.Data.LMDB,
-                              batch_size=128, ntop=2,
-                              transform_param=dict(mean_file=mean_file,
-                                                   crop_size=28,
-                                                   mirror=True))     
-    else:
-        data, labels = L.Data(source = test_file, backend = P.Data.LMDB, 
-                              batch_size = 128, ntop = 2, 
-                              transform_param = dict(mean_file = mean_file, 
-                                                      crop_size =28))
 
     # 每个 ConvX_X 都有 3 个Residual Block                                                  
     repeat = 3
-    #conv1
-    scale, result = conv_BN_scale_relu(split, data, numout = 16, kernelsize = 3, 
-                                       stride = 1, pad = 1)
 
     # Conv2_X，输入与输出的数据通道数都是 16， 大小都是 32 x 32，可以直接相加，
     # 设置映射步长为 1
@@ -112,11 +129,16 @@ def ResNet(split):
                           projection_stride = projection_stride, pad = 1)
         
     pool = L.Pooling(result, pool = P.Pooling.AVE, global_pooling = True)
-    IP = L.InnerProduct(pool, num_output = 10, weight_filler = dict(type = 'xavier'), bias_filler = dict(type = 'constant'))
+    IP = L.InnerProduct(pool, num_output = 10, weight_filler = dict(type = 'gaussian'), bias_filler = dict(type = 'constant'))
     
-    acc = L.Accuracy(IP, labels)
+    #如果生成deploy文件只需Softmax层
+    if split == 'deploy':
+        prob = L.Softmax(IP)
+        return to_proto(prob)
+            
+    acc = L.Accuracy(IP, labels)    
     loss = L.SoftmaxWithLoss(IP, labels)
-    
+
     return to_proto(acc, loss)
     
 # 生成 ResNet 网络的 prototxt 文件
@@ -130,10 +152,21 @@ def make_net():
     with open(test_dir, 'w') as f:
         f.write(str(ResNet('test')))
 
+    # 创建 deploy.prototxt 并将 ResNet 函数返回的值写入 deploy.prototxt
+    with open(deploy_dir, 'w') as f:
+        f.write('name:"ResNet"\n')
+        f.write('input:"data"\n')
+        f.write('input_dim:1\n')
+        f.write('input_dim:3\n')
+        f.write('input_dim:28\n')
+        f.write('input_dim:28\n')
+        f.write(str(ResNet('deploy')))
+
 if __name__ == '__main__':
     
     train_dir = './train.prototxt'
     test_dir = './test.prototxt'
+    deploy_dir = './deploy.prototxt'
     solver_dir = './res_net_solver.prototxt'
     # 生成train和test文件
     make_net()

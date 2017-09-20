@@ -1,22 +1,13 @@
-layer {
-  name: "Data1"
-  type: "Data"
-  top: "Data1"
-  top: "Data2"
-  transform_param {
-    crop_size: 28
-    mean_file: "../data/mean.binaryproto"
-  }
-  data_param {
-    source: "../data/cifar10_test_lmdb"
-    batch_size: 100
-    backend: LMDB
-  }
-}
+name:"ResNet"
+input:"data"
+input_dim:1
+input_dim:3
+input_dim:28
+input_dim:28
 layer {
   name: "Convolution1"
   type: "Convolution"
-  bottom: "Data1"
+  bottom: "data"
   top: "Convolution1"
   param {
     lr_mult: 1
@@ -1440,16 +1431,8 @@ layer {
   }
 }
 layer {
-  name: "Accuracy1"
-  type: "Accuracy"
+  name: "Softmax1"
+  type: "Softmax"
   bottom: "InnerProduct1"
-  bottom: "Data2"
-  top: "Accuracy1"
-}
-layer {
-  name: "SoftmaxWithLoss1"
-  type: "SoftmaxWithLoss"
-  bottom: "InnerProduct1"
-  bottom: "Data2"
-  top: "SoftmaxWithLoss1"
+  top: "Softmax1"
 }

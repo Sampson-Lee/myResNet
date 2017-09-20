@@ -64,25 +64,34 @@ class CaffeSolver:
 
         self.sp = {}
 
-        # critical:
+        # learning rate policy
         self.sp['base_lr'] = '0.1'
+        
+        self.sp['type'] = '""'
         self.sp['momentum'] = '0.9'
+        self.sp['gamma'] = '0.1'
+        # 学习率退火：base_lr*gamma^(floor(iter/stepsize))
+        self.sp['lr_policy'] = '"multistep"'
+        self.sp['stepvalue'] = '10000'
+        self.sp['stepvalue'] = '20000'
+        self.sp['stepvalue'] = '50000'
+#        self.sp['lr_policy'] = '"step"'
+#        self.sp['stepsize'] = '1000'        
+        
+        #regularization
+        self.sp['weight_decay'] = '0.0001'
 
-        # speed:
+        # test_iter* batchsize（测试集的）>=测试集的大小
         self.sp['test_iter'] = '100'
         self.sp['test_interval'] = '500'
 
         # looks:
         self.sp['display'] = '100'
-        self.sp['snapshot'] = '2500'
-        self.sp['snapshot_prefix'] = '"./snapshot"'  # string within a string!
+        self.sp['snapshot'] = '10000'
+        self.sp['snapshot_prefix'] = '"model"'  # string within a string!
+        self.sp['solver_mode'] = 'GPU'
 
-        # learning rate policy
-        self.sp['lr_policy'] = '"multistep"'
 
-        # important, but rare:
-        self.sp['gamma'] = '0.1'
-        self.sp['weight_decay'] = '0.0001'
         self.sp['train_net'] = '"' + trainnet_prototxt_path + '"'
         self.sp['test_net'] = '"' + testnet_prototxt_path + '"'
 
