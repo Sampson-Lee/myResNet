@@ -39,7 +39,7 @@ if not os.path.exists(cifar_caffe_directory):
             d=unpickle(
                 os.path.join(cifar_python_directory,batch)
             )
-            data.append(d['data'])
+            data.append(d['data'])# 读取的数据为字典，将数据连接
             labels.append(np.array(d['labels']))
         data=np.concatenate(data)
         labels=np.concatenate(labels)

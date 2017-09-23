@@ -146,10 +146,12 @@ def make_net():
     
     # 创建 train.prototxt 并将 ResNet 函数返回的值写入 train.prototxt
     with open(train_dir, 'w') as f:
+        f.write('name:"ResNet"\n')
         f.write(str(ResNet('train')))
         
     # 创建 test.prototxt 并将 ResNet 函数返回的值写入 test.prototxt
     with open(test_dir, 'w') as f:
+        f.write('name:"ResNet"\n')
         f.write(str(ResNet('test')))
 
     # 创建 deploy.prototxt 并将 ResNet 函数返回的值写入 deploy.prototxt

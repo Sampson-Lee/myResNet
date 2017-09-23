@@ -10,17 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as img
 np.seterr(divide='ignore', invalid='ignore')
-#加载路径
-deploy_dir='./deploy.prototxt'    #deploy文件
-model_dir='./cifar10_resnet_iter_35000.caffemodel'   #caffemodel
-img_dir='./airplane.jpg'    #待测图片
-mean_dir='../data/mean.npy'
-labeltxt_dir='./labels.txt'  #类别名称文件，将数字标签转换回类别名称
-#加载model和network
-net = caffe.Net(deploy_dir,model_dir,caffe.TEST)
 
-mu=np.load(mean_dir).mean(1).mean(1)
-#print('mean-subtracted values:',zip('BGR',mu))
 def preprocess(image,channel,height,width):
 	#定义转换也即是预处理函数
 	#caffe中用的图像是BGR空间，但是matplotlib用的是RGB空间；
@@ -36,22 +26,31 @@ def preprocess(image,channel,height,width):
 	                          height, width)  # image size is 28*28
 	net.blobs['data'].data[...] = transformer.preprocess('data',image)      #执行上面设置的图片预处理操作，并将图片载入到blob中
 
-
-image = caffe.io.load_image(img_dir)
-preprocess(image,3,28,28)
-#进行分类
-output = net.forward()
-prob= net.blobs['Softmax1'].data[0].flatten()
-print('predicted class is:', prob.argmax())
-labels = np.loadtxt(labeltxt_dir, str, delimiter='\t')
-print('output label:', labels[prob.argmax()])
-
-top_inds = prob.argsort()[::-1][:5]  # 反转排序并取最大五项
-print('probabilities and labels:', zip(prob[top_inds], labels[top_inds]))
-
-# 显示图片
-# img = img.imread(img_dir)
-# plt.imshow(image)
-# plt.axis('off')
-# plt.title(labels[prob.argmax()])
-# plt.show()
+if __name__ == '__main__':
+    #加载路径
+    deploy_dir='./deploy.prototxt'    #deploy文件
+    model_dir='./cifar10_resnet_iter_35000.caffemodel'   #caffemodel
+    img_dir='./airplane.jpg'    #待测图片
+    mean_dir='../data/mean.npy'
+    labeltxt_dir='./labels.txt'  #类别名称文件，将数字标签转换回类别名称
+    mu=np.load(mean_dir).mean(1).mean(1)
+    #print('mean-subtracted values:',zip('BGR',mu))
+    
+    #加载model和network
+    net = caffe.Net(deploy_dir,model_dir,caffe.TEST)
+    image = caffe.io.load_image(img_dir)
+    preprocess(image,3,28,28)
+    #进行分类
+    output = net.forward()
+    prob= net.blobs['Softmax1'].data[0].flatten()
+    print('predicted class is:', prob.argmax())
+    labels = np.loadtxt(labeltxt_dir, str, delimiter='\t')
+    print('output label:', labels[prob.argmax()])
+    top_inds = prob.argsort()[::-1][:5]  # 反转排序并取最大五项
+    print('probabilities and labels:', zip(prob[top_inds], labels[top_inds]))
+     #显示图片
+    img = img.imread(img_dir)
+    plt.imshow(image)
+    plt.axis('off')
+    plt.title(labels[prob.argmax()])
+    plt.show()

@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 from caffe.proto import caffe_pb2
 import time
+#打开lmdb文件，读取数据
 lmdb_env=lmdb.open('./cifar10_pad4_train_lmdb')
 lmdb_txn=lmdb_env.begin()
 lmdb_cursor=lmdb_txn.cursor()
@@ -17,6 +18,7 @@ for key,value in lmdb_cursor:
     datum.ParseFromString(value)
     data=caffe.io.datum_to_array(datum)
     image=data.transpose(1,2,0)
+    #计算图像各通道的平均值
     mean[0][0] += image[:, :, 0]
     mean[0][1] += image[:, :, 1]
     mean[0][2] += image[:, :, 2]

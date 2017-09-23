@@ -5,9 +5,9 @@ gamma: 0.1
 iter_size: 1
 lr_policy: "multistep"
 #stepsize:4000
-stepvalue:4000
-stepvalue:8000
-max_iter: 10000
+stepvalue:32000
+stepvalue:48000
+max_iter: 64000
 momentum: 0.9
 snapshot: 10000
 snapshot_prefix: "cifar10_res20"
