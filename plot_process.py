@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import re
-import click
-from matplotlib import pylab as plt
+import re   #正则表达式
+import click    #命令行窗口
+from matplotlib import pylab as plt #绘图
 
 
-@click.command()
-@click.argument('files', nargs=-1, type=click.Path(exists=True))
+@click.command()   #装饰一个函数，使之成为命令行接口
+@click.argument('files', nargs=-1, type=click.Path(exists=True))    #添加命令行选项，参数值为已存在的文件名
 def main(files):
     plt.style.use('ggplot')
     fig, ax1 = plt.subplots()
@@ -25,6 +25,7 @@ def parse_log(log_file):
 
     # iter_num: group0, loss_val: group1
     # Iteration iter_num(\d), loss = loss_val +-((0(.0))or(.0))(eE+-0)
+    # 正则表达式模板
     loss_pattern = r"Iteration (?P<iter_num>\d+), loss = (?P<loss_val>[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
     test_num_pattern = r"Iteration (?P<test_num>\d+), Testing net"
     test_loss_pattern = r"Test net output #0: loss = (?P<test_loss>[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"

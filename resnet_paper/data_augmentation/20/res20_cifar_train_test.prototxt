@@ -9,7 +9,7 @@ layer {
   }
   transform_param {
     mean_file: "/data/lixinpeng/ResNet_Cifar10_Caffe/script_data/mean.binaryproto"
-    crop_size: 28
+    crop_size: 32
     mirror:true
   }
   data_param {
