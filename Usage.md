@@ -40,6 +40,16 @@ Input
   ```
 
   Additionally, you are suggested to use train.sh and test.sh just modifing the path
+
+  ## python script
+myVisual.py: visualize filters and feature
+
+myAPP.py: apply resnetmodel to inference picture
+
+myDemo.py: generalize the prototxt files of train, test, deploy and solver
+
+myTraining.py: train network and plot its process
+
 ## Result
 ### Result with data augmentation:
 model|Repeated|Reference
@@ -73,5 +83,4 @@ resnet_python:
 - [从零开始搭建 ResNet 之 残差网络结构介绍和数据准备](http://www.cnblogs.com/Charles-Wan/p/6442294.html)
 - [从零开始搭建 ResNet 之 网络的搭建（上）](http://www.cnblogs.com/Charles-Wan/p/6535395.html#3764266)
 - [从零开始搭建 ResNet 之 网络的搭建（中）](http://www.cnblogs.com/Charles-Wan/p/6660077.html#3764263)
-
 
