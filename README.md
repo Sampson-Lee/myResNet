@@ -1,8 +1,8 @@
-# ResNets experiments on cifar10 with caffe
+# ResNet V1 experiments on cifar10 with caffe
 
 ## Structure
 
-  The network structure is here(we only list the network of 20 depth):
+  The network structure(the identity shortcuts use type B) is here(we only list the network of 20 depth):
   	<br/>[PlainNet_20](http://ethereon.github.io/netscope/#/gist/18200c298ed00d846cfd511babe70a9b)
     <br/>[ResNet_python_20](http://ethereon.github.io/netscope/#/gist/57f30b382aa1e8f32daa75b3bf85cbe5)
   	<br/>[ResNet_paper_20](http://ethereon.github.io/netscope/#/gist/544993a5985bb87e11443dc1dbcb4881)
@@ -46,7 +46,7 @@ myVisual.py: visualize filters and feature
 
 myAPP.py: apply resnetmodel to inference picture
 
-myDemo.py: generalize the prototxt files of train, test, deploy and solver
+myRes.py: generalize the prototxt files of train, test, deploy and solver
 
 myTraining.py: train network and plot its process
 
