@@ -84,3 +84,5 @@ resnet_python:
 - [从零开始搭建 ResNet 之 网络的搭建（上）](http://www.cnblogs.com/Charles-Wan/p/6535395.html#3764266)
 - [从零开始搭建 ResNet 之 网络的搭建（中）](http://www.cnblogs.com/Charles-Wan/p/6660077.html#3764263)
 
+## supplement
+Variants.md and Comprehension.md are my explorion in Res-family, there are some reference codes: [caffe-model](https://github.com/GeekLiB/caffe-model)

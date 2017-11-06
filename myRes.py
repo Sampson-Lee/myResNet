@@ -5,8 +5,6 @@ Created on Fri Sep 15 16:04:51 2017
 @author: Sampson
 """
 
-import caffe
-import numpy as np
 from caffe import layers as L, params as P, to_proto
 import tools
 
@@ -55,7 +53,6 @@ def ResNet(split):
     # 写入数据的路径
     train_file = '../data/cifar10_train_lmdb'
     test_file = '../data/cifar10_test_lmdb'
-    mean_file = '../data/mean.binaryproto'
 
     # source: 导入的训练数据路径; 
     # backend: 训练数据的格式; 
